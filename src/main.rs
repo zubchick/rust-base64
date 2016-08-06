@@ -1,17 +1,26 @@
+use std::io;
 use std::str;
 
 extern crate base64;
 
-fn main() {
-    let res = base64::encode("Hello world".as_bytes());
-    println!("{}", str::from_utf8(&res).unwrap());
+fn encode(file: &mut io::Read) {
+    let mut buf: [u8; 1024 * 4] = [0; 1024 * 4];
 
-    match base64::decode(&res) {
-        Ok(data) => {
-            println!("{}", str::from_utf8(&data).unwrap());
-        },
-        Err(err) => {
-            println!("error: {:?}", err);
+    loop {
+        match file.read(&mut buf[..]) {
+            Ok(count) => {
+                if count == 0 {
+                    print!("\n");
+                    break;
+                }
+                let res = base64::encode(&buf);
+                print!("{}", str::from_utf8(&res[..count + 1]).unwrap());
+            },
+            Err(err) => panic!(err),
         }
-    };
+    }
+}
+
+fn main() {
+    encode(&mut io::stdin());
 }
