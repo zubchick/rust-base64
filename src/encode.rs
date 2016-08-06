@@ -9,11 +9,11 @@ fn encode_block(block: &[u8]) -> [u8; 4] {
         bitvec |= x;
     }
 
-    //                              <-----> six bytes
+    //                              <-----> six bits
     let mut mask: u32 = 0b0000_0000_1111_1100_0000_0000_0000_0000;
     let mut res: [u8; 4] = [0; 4];
 
-    // divide three octets of bitvec (2, 3, 4) to four six-bytes integers
+    // divide three octets of bitvec (2, 3, 4) to four six-bits integers
     for i in 0..4 {
         res[i] = ((bitvec & mask) >> (6 * (3 - i))) as u8;
         mask = mask >> 6;
