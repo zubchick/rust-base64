@@ -34,18 +34,6 @@ struct Args {
     flag_version: bool,
 }
 
-fn process_file<F>(func: F, file: &mut io::Read)
-where F: Fn(&mut [u8; BUF_SIZE], usize) {
-    let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
-
-    loop {
-        match file.read(&mut buf[..]) {
-            Ok(count) => func(&mut buf, count),
-            Err(err) => panic!(err),
-        }
-    }
-}
-
 fn encode(file: &mut io::Read) {
     let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
     let mut stdout = io::stdout();
@@ -76,7 +64,6 @@ fn decode(file: &mut io::Read) {
                 if count == 0 {
                      break;
                 }
-                println!("{:?}", str::from_utf8(&buf[..count])); // DEBUG
                 match base64::decode(&buf[..count]) {
                     Ok(res) => {
                         stdout.write(&res).unwrap();
@@ -101,12 +88,6 @@ fn process(file: &mut io::Read, is_decode: bool) {
 }
 
 fn main() {
-    /*
-    match base64::decode(b"cXdlCg==") {
-        Err(msg) => println!("{}", msg),
-        Ok(data) => println!("{}", str::from_utf8(&data).unwrap()),
-    }
-    */
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.decode())
         .unwrap_or_else(|e| e.exit());
