@@ -23,7 +23,7 @@ fn decode_block(block: &[u8]) -> [u8; 3] {
 
 
 pub fn decode(table: &[u8], data: &[u8]) -> Result<Vec<u8>> {
-    let mut data = data.iter();
+    let mut data = data.iter().filter(|&&x| x != '\n' as u8);
     let mut block: [u8; 4] = [0; 4];
     let mut res = Vec::new();
 
