@@ -62,3 +62,74 @@ pub fn decode(table: &[u8], data: &[u8]) -> Result<Vec<u8>> {
         }
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::{decode_block, decode};
+
+    #[test]
+    fn test_block() {
+        let examples = [
+            ([0u8, 0, 0], [0u8, 0, 0, 0]),
+            ([1, 0, 0], [0, 16, 0, 0]),
+            ([0, 1, 0], [0, 0, 4, 0]),
+            ([0, 0, 1], [0, 0, 0, 1]),
+        ];
+        for &(res, block) in examples.iter() {
+            assert_eq!(res, decode_block(&block));
+        }
+    }
+
+    #[test]
+    fn test_decode() {
+        let mut table = [1; 256];
+        table[0] = 0;
+        table['=' as usize] = 0;
+
+        let examples = [
+            ("AAAA", vec![4u8, 16, 65]),
+            ("AA\nAA", vec![4u8, 16, 65]),
+            ("A\n\nA\nAA\n", vec![4u8, 16, 65]),
+
+            ("AAA=", vec![4u8, 16]),
+            ("AA==", vec![4u8]),
+            ("", vec![]),
+        ];
+
+        for &(data, ref res) in examples.iter() {
+            assert_eq!(
+                decode(&table, data.as_bytes()).unwrap()
+                    .iter().collect::<Vec<_>>(),
+                res.iter().collect::<Vec<_>>()
+            );
+        }
+    }
+
+    #[test]
+    fn test_decode_fail() {
+        let mut table = [1; 256];
+        table[0] = 0;
+        table['=' as usize] = 0;
+        table['+' as usize] = 0;
+
+        let pad_err = "Invalid padding";
+        let chr_err = "Invalid character";
+        let examples = [
+            ("A==", pad_err),
+            ("AA", pad_err),
+            ("A", pad_err),
+            ("A=", pad_err),
+
+            ("A+A=", chr_err),
+            ("++", chr_err),
+        ];
+
+        for &(data, msg) in examples.iter() {
+            match decode(&table, data.as_bytes()) {
+                Ok(_) => panic!("This test expect wrong input data"),
+                Err(err) => assert_eq!(err, msg),
+            }
+        }
+    }
+}

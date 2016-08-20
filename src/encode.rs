@@ -63,3 +63,46 @@ pub fn encode(table: &[u8], data: &[u8]) -> Vec<u8> {
     }
     res
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::{encode_block, encode};
+
+    #[test]
+    fn test_block() {
+        let examples = [
+            ([0u8, 0, 0], [0u8, 0, 0, 0]),
+            ([1, 0, 0], [0, 16, 0, 0]),
+            ([0, 1, 0], [0, 0, 4, 0]),
+            ([0, 0, 1], [0, 0, 0, 1]),
+        ];
+        for &(block, res) in examples.iter() {
+            assert_eq!(res, encode_block(&block));
+        }
+    }
+
+    #[test]
+    fn test_encode() {
+        let c = '+' as u8;
+        let eq = '=' as u8;
+        let table = [c; 64];
+
+        assert_eq!([c; 4].iter().collect::<Vec<_>>(),
+                   encode(&table, b"qwe").iter().collect::<Vec<_>>());
+
+        let examples = [
+            ("qwe", vec![c; 4]),
+            ("qweqwe", vec![c; 8]),
+            ("q", vec![c, c, eq, eq]),
+            ("qw", vec![c, c, c, eq]),
+        ];
+
+        for &(data, ref res) in examples.iter() {
+            assert_eq!(
+                res.iter().collect::<Vec<_>>(),
+                encode(&table, data.as_bytes()).iter().collect::<Vec<_>>()
+            );
+        }
+    }
+}
