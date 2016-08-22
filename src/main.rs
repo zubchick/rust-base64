@@ -12,7 +12,7 @@ use docopt::Docopt;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-const BUF_SIZE: usize = 4 * 1024;
+const BUF_SIZE: usize = 4 * 1024 - 1;
 
 const USAGE: &'static str = "
 Base64 encode or decode FILE, or standard input, to standard output.
