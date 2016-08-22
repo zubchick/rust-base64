@@ -45,8 +45,8 @@ fn encode(file: &mut io::Read) {
                     print!("\n");
                     break;
                 }
-                let res = base64::encode(&buf);
-                stdout.write(&res[..count + 1]).unwrap();
+                let res = base64::encode(&buf[..count]);
+                stdout.write(&res).unwrap();
             },
             Err(err) => panic!(err),
         }
