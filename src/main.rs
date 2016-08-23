@@ -12,7 +12,8 @@ use docopt::Docopt;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-const BUF_SIZE: usize = 4 * 1024 - 1;
+// MAGIC (!) buf size divisible by 3 for encode and by 4 for decode
+const BUF_SIZE: usize = 4092;
 
 const USAGE: &'static str = "
 Base64 encode or decode FILE, or standard input, to standard output.
@@ -35,7 +36,7 @@ struct Args {
 }
 
 fn encode(file: &mut io::Read) {
-    let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
+    let mut buf = [0u8; BUF_SIZE];
     let mut stdout = io::stdout();
 
     loop {
@@ -54,7 +55,7 @@ fn encode(file: &mut io::Read) {
 }
 
 fn decode(file: &mut io::Read) {
-    let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
+    let mut buf = [0u8; BUF_SIZE];
     let mut stdout = io::stdout();
     let mut stderr = io::stderr();
 
