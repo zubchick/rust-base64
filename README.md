@@ -1,5 +1,7 @@
 # cli base64 encoder/decoder #
 
+[![Build Status](https://travis-ci.org/zubchick/rust-base64.svg?branch=master)](https://travis-ci.org/zubchick/rust-base64)
+
 This is just a "Hello world". My first rust exercise.
 
 ### Usage
