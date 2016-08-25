@@ -1,7 +1,7 @@
 [package]
 name = "base64"
-version = "0.1.0"
-authors = ["Nikita Zubkov <zubchick@gmail.com>"]
+version = "1.0.0"
+authors = ["Nikita Zubkov <zubchick@yandex.ru>"]
 license = "MIT"
 
 [dependencies]
