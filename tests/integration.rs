@@ -3,6 +3,7 @@ use std::str;
 
 #[test]
 fn test_encode_decode_valid() {
+    let mut out = [0u8; 256];
     let examples = [
         // empty
         ("", ""),
@@ -24,8 +25,9 @@ fn test_encode_decode_valid() {
     ];
 
     for &(data, encoded) in examples.iter() {
+        let count = base64::encode(data.as_bytes(), &mut out);
         assert_eq!(
-            str::from_utf8(&base64::encode(data.as_bytes())),
+            str::from_utf8(&out[..count]),
             str::from_utf8(&encoded.as_bytes())
         );
         assert_eq!(

@@ -37,6 +37,7 @@ struct Args {
 
 fn encode(file: &mut io::Read) {
     let mut buf = [0u8; BUF_SIZE];
+    let mut out_buf = [0u8; BUF_SIZE * 4 / 3];
     let mut stdout = io::stdout();
 
     loop {
@@ -46,8 +47,9 @@ fn encode(file: &mut io::Read) {
                     print!("\n");
                     break;
                 }
-                let res = base64::encode(&buf[..count]);
-                stdout.write(&res).unwrap();
+                let encode_count = base64::encode(
+                    &buf[..count], &mut out_buf);
+                stdout.write(&out_buf[..encode_count]).unwrap();
             },
             Err(err) => panic!(err),
         }

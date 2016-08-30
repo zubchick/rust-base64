@@ -21,13 +21,14 @@ fn encode_block(block: &[u8]) -> [u8; 4] {
     res
 }
 
-/// get translation table and str data, return encoded string
-pub fn encode(table: &[u8], data: &[u8]) -> Vec<u8> {
+/// get translation table and input data buffer, output data buffer
+/// and return count of encoded bytes
+pub fn encode(table: &[u8], data: &[u8], out: &mut [u8]) -> usize {
     let mut data = data.iter();
     let mut block: [u8; 3] = [0; 3];
-    let mut res = Vec::new();
     let mut done = false;
     let mut count;
+    let mut out_size: usize = 0;
 
     while !done {
         count = 0;
@@ -54,14 +55,15 @@ pub fn encode(table: &[u8], data: &[u8]) -> Vec<u8> {
 
         for idx in &encode_block(&block) {
             if count + 1 != 0 {
-                res.push(table[*idx as usize]);
+                out[out_size] = table[*idx as usize];
                 count -= 1;
             } else {
-                res.push('=' as u8);
+                out[out_size] = '=' as u8;
             }
+            out_size += 1;
         }
     }
-    res
+    out_size
 }
 
 
@@ -87,9 +89,7 @@ mod tests {
         let c = '+' as u8;
         let eq = '=' as u8;
         let table = [c; 64];
-
-        assert_eq!([c; 4].iter().collect::<Vec<_>>(),
-                   encode(&table, b"qwe").iter().collect::<Vec<_>>());
+        let mut out = [0u8; 8];
 
         let examples = [
             ("qwe", vec![c; 4]),
@@ -99,10 +99,9 @@ mod tests {
         ];
 
         for &(data, ref res) in examples.iter() {
-            assert_eq!(
-                res.iter().collect::<Vec<_>>(),
-                encode(&table, data.as_bytes()).iter().collect::<Vec<_>>()
-            );
+            let count = encode(&table, data.as_bytes(), &mut out);
+            assert_eq!(res.iter().collect::<Vec<_>>(),
+                       out[..count].iter().collect::<Vec<_>>());
         }
     }
 }
