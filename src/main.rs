@@ -58,6 +58,7 @@ fn encode(file: &mut io::Read) {
 
 fn decode(file: &mut io::Read) {
     let mut buf = [0u8; BUF_SIZE];
+    let mut out_buf = [0u8; BUF_SIZE * 3 / 4];
     let mut stdout = io::stdout();
     let mut stderr = io::stderr();
 
@@ -67,9 +68,9 @@ fn decode(file: &mut io::Read) {
                 if count == 0 {
                      break;
                 }
-                match base64::decode(&buf[..count]) {
-                    Ok(res) => {
-                        stdout.write(&res).unwrap();
+                match base64::decode(&buf[..count], &mut out_buf) {
+                    Ok(count) => {
+                        stdout.write(&mut out_buf[..count]).unwrap();
                     },
                     Err(msg) => {
                         stderr.write(msg.as_bytes()).unwrap();

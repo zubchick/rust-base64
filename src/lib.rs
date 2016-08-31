@@ -18,10 +18,10 @@ fn make_decode_table(alphabet: &[u8; 64]) -> [u8; 256] {
 }
 
 pub fn encode(data: &[u8], out: &mut [u8]) -> usize {
-    return encode::encode(ALPHABET, data, out)
+    encode::encode(ALPHABET, data, out)
 }
 
-pub fn decode(data: &[u8]) -> Result<Vec<u8>> {
+pub fn decode(data: &[u8], out: &mut [u8]) -> Result<usize> {
     let table: [u8; 256] = make_decode_table(ALPHABET);
-    decode::decode(&table, data)
+    decode::decode(&table, data, out)
 }

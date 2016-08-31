@@ -30,8 +30,9 @@ fn test_encode_decode_valid() {
             str::from_utf8(&out[..count]),
             str::from_utf8(&encoded.as_bytes())
         );
+        let count = base64::decode(encoded.as_bytes(), &mut out).unwrap();
         assert_eq!(
-            str::from_utf8(&base64::decode(encoded.as_bytes()).unwrap()),
+            str::from_utf8(&out[..count]),
             str::from_utf8(&data.as_bytes())
         )
     }
@@ -39,6 +40,8 @@ fn test_encode_decode_valid() {
 
 #[test]
 fn test_decode() {
+    let mut out = [0u8; 256];
+
     let examples = [
         (Ok("qw"), "\n\n\nc\nX\nc\n="),
         (Err("Invalid padding"), "cXc"),
@@ -46,21 +49,21 @@ fn test_decode() {
     ];
 
     for &(data, encoded) in examples.iter() {
-        let res = base64::decode(encoded.as_bytes());
-        match (res, data) {
-            (Ok(res), Ok(data)) => assert_eq!(
-                str::from_utf8(&res).unwrap(),
+        let res = base64::decode(encoded.as_bytes(), &mut out);
+        match (res, out, data) {
+            (Ok(count), res, Ok(data)) => assert_eq!(
+                str::from_utf8(&out[..count]).unwrap(),
                 data
             ),
-            (Ok(_), Err(msg)) => panic!(
+            (Ok(_), _, Err(msg)) => panic!(
                 "base64::decode return Ok when Err({}) expected",
                 msg
             ),
-            (Err(msg), Ok(_)) => panic!(
+            (Err(msg), _, Ok(_)) => panic!(
                 "base64::decode return Err({}) when it not expected",
                 msg
             ),
-            (Err(msg), Err(expected)) => assert_eq!(
+            (Err(msg), _, Err(expected)) => assert_eq!(
                 msg, expected
             )
         }

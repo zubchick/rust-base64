@@ -22,10 +22,10 @@ fn decode_block(block: &[u8]) -> [u8; 3] {
 }
 
 
-pub fn decode(table: &[u8], data: &[u8]) -> Result<Vec<u8>> {
+pub fn decode(table: &[u8], data: &[u8], out: &mut [u8]) -> Result<usize> {
     let mut data = data.iter().filter(|&&x| x != '\n' as u8);
     let mut block: [u8; 4] = [0; 4];
-    let mut res = Vec::new();
+    let mut total_count: usize = 0;
 
     loop {
         let mut skip = 0;
@@ -51,14 +51,15 @@ pub fn decode(table: &[u8], data: &[u8]) -> Result<Vec<u8>> {
                     if i != 0 {
                         return Err("Invalid padding");
                     } else {
-                        return Ok(res);
+                        return Ok(total_count);
                     }
                 },
             }
         }
         let decoded = &decode_block(&block);
         for &idx in decoded[..3 - skip].iter() {
-            res.push(idx);
+            out[total_count] = idx;
+            total_count += 1;
         }
     }
 }
@@ -83,7 +84,9 @@ mod tests {
 
     #[test]
     fn test_decode() {
-        let mut table = [1; 256];
+        let mut table = [1u8; 256];
+        let mut out = [0u8; 256];
+
         table[0] = 0;
         table['=' as usize] = 0;
 
@@ -98,9 +101,10 @@ mod tests {
         ];
 
         for &(data, ref res) in examples.iter() {
+            let count = decode(&table, data.as_bytes(), &mut out)
+                .unwrap();
             assert_eq!(
-                decode(&table, data.as_bytes()).unwrap()
-                    .iter().collect::<Vec<_>>(),
+                out[..count].iter().collect::<Vec<_>>(),
                 res.iter().collect::<Vec<_>>()
             );
         }
@@ -108,7 +112,9 @@ mod tests {
 
     #[test]
     fn test_decode_fail() {
-        let mut table = [1; 256];
+        let mut table = [1u8; 256];
+        let mut out = [0u8; 256];
+
         table[0] = 0;
         table['=' as usize] = 0;
         table['+' as usize] = 0;
@@ -126,7 +132,7 @@ mod tests {
         ];
 
         for &(data, msg) in examples.iter() {
-            match decode(&table, data.as_bytes()) {
+            match decode(&table, data.as_bytes(), &mut out) {
                 Ok(_) => panic!("This test expect wrong input data"),
                 Err(err) => assert_eq!(err, msg),
             }
