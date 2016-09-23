@@ -51,7 +51,7 @@ fn test_decode() {
     for &(data, encoded) in examples.iter() {
         let res = base64::decode(encoded.as_bytes(), &mut out);
         match (res, out, data) {
-            (Ok(count), res, Ok(data)) => assert_eq!(
+            (Ok(count), _, Ok(data)) => assert_eq!(
                 str::from_utf8(&out[..count]).unwrap(),
                 data
             ),
