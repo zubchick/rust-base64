@@ -12,11 +12,15 @@ Usage: base64 [options] [<file>]
        base64 (--help | --version)
 
 Options:
-  -d --decode   decode data
+  -d --decode      decode data
+  -w --wrap COLS   wrap encoded lines after COLS character (default 76).
+                   Use 0 to disable line wrapping
+
   -h --help     display this help and exit
   --version     output version information and exit
 ```
 
 ### Development
-* `cargo build --release` to build
-* `cargo test` to run tests
+* `cargo build --release` to build release
+* `make test` to run tests
+* `make bench` to run benchmarks

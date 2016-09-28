@@ -23,9 +23,10 @@ Usage: base64 [options] [<file>]
 
 Options:
   -d --decode      decode data
-  -h --help        display this help and exit
   -w --wrap COLS   wrap encoded lines after COLS character (default 76).
                    Use 0 to disable line wrapping
+
+  -h --help     display this help and exit
   --version     output version information and exit
 ";
 
