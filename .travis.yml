@@ -4,5 +4,12 @@ rust:
     - beta
     - nightly
 matrix:
-    allow_failures:
+    include:
+        - rust: stable
+          env: TARGET=test
+        - rust: beta
+          env: TARGET=test
         - rust: nightly
+          env: TARGET=bench
+
+script: make $TARGET
