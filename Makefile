@@ -1,8 +1,8 @@
-all: bench
+all: test
 
 test:
 	cargo build --verbose
 	cargo test --verbose
 
-bench: test
+bench:
 	cargo bench --verbose
